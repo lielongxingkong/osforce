@@ -83,5 +83,5 @@ static __exit void mexit(void){
 	printk("call %s\n", __FUNCTION__);
 	cleanup_threads();
 }
-module_init(minit)
-module_exit(mexit)
+module_init(minit);
+module_exit(mexit);
