@@ -12,7 +12,7 @@ struct node{
 };
 
 struct ringbuf{
-	struct node *buf;
+	struct node *head;
 	int entries;
 	struct node *front;
 	struct node *rear;
