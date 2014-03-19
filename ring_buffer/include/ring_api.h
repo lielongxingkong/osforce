@@ -19,7 +19,7 @@ struct ringbuf{
 	struct rw_semaphore rwsema;
 };
 
-int init_ringbuf(struct ringbuf *ring);
+struct ringbuf *init_ringbuf(void);
 int clean_ringbuf(struct ringbuf *ring);
 bool full(struct ringbuf *ring);
 bool empty(struct ringbuf *ring);
