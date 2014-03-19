@@ -1,5 +1,7 @@
 #include <linux/list.h>
 #include <linux/rwsem.h>
+#define INIT_LENGTH	1000
+
 struct elem{
 	int data;
 };
