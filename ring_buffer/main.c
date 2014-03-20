@@ -12,6 +12,9 @@ MODULE_AUTHOR("Zhao Zhenlong");
 MODULE_DESCRIPTION("Ring buffer module.");
 
 #define MAX_THREADS	10
+
+static struct ringbuf ring;
+
 static unsigned long reader_bitmap;
 
 static void set_reader_number(int reader){
@@ -68,11 +71,23 @@ static int cleanup_threads(void){
 	return 0;
 }
 
+static void test(void)
+{
+	struct list_head *ptr;
+	struct ringnode *entry;
+	list_for_each(ptr, &(ring.head)->list){
+		entry = list_entry(ptr, struct ringnode, list);
+		printk("[DEBUG] %d\n", entry->e.data);
+	}
+}
+
 static __init int minit(void){
 	printk("call %s\n", __FUNCTION__); 
 	set_reader_number(0);
 	if(create_threads())
 		goto err;
+	init_ringbuf(&ring);
+	test();
 	return 0;
 err:
 	cleanup_threads();
