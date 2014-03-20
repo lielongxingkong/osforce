@@ -1,9 +1,31 @@
-#include <linux/slab.h>
-#include <ring_api.h>
-
+#include "ring_api.h"
 
 int init_ringbuf(struct ringbuf *ring)
 {
+		int i;
+		struct rw_semaphore rwsem;
+		struct ringnode *ring_head;
+		ring_head = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
+		INIT_LIST_HEAD(&ring_head->list);	
+		for(i = 1; i < INIT_LENGTH; i++){
+			struct ringnode *nd = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
+			if(!IS_ERR(nd)){
+					struct elem e;
+					e.data = i;
+					nd->e = e;
+					list_add(&nd->list, &ring_head->list);
+			} else {
+					printk("Out of memeory!\n");
+					return -1;
+			}
+		}
+
+		init_rwsem(&rwsem);	
+		ring->head = ring_head;
+		ring->entries = INIT_LENGTH;
+		ring->front = ring_head;
+		ring->rear = ring_head;
+		ring->rwsem = rwsem;
 		return 0;	
 }
 
