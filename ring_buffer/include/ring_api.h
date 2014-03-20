@@ -1,25 +1,28 @@
 #include <linux/list.h>
+#include <linux/slab.h>
+#include <linux/err.h>
 #include <linux/rwsem.h>
+#include <linux/semaphore.h>
 #define INIT_LENGTH	1000
 
 struct elem{
 	int data;
 };
 
-struct node{
+struct ringnode{
 	struct elem e;
 	struct list_head list;
 };
 
 struct ringbuf{
-	struct node *head;
+	struct ringnode *head;
 	int entries;
-	struct node *front;
-	struct node *rear;
-	struct rw_semaphore rwsema;
+	struct ringnode *front;
+	struct ringnode *rear;
+	struct rw_semaphore rwsem;
 };
 
-struct ringbuf *init_ringbuf(void);
+int init_ringbuf(struct ringbuf *ring);
 int clean_ringbuf(struct ringbuf *ring);
 bool full(struct ringbuf *ring);
 bool empty(struct ringbuf *ring);
