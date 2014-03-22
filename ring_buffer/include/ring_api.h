@@ -36,3 +36,4 @@ int extend(struct ringbuf *ring, int extend_len);
 int __push(struct ringbuf *ring, struct elem *e);
 /*pop no lock*/
 int __pop(struct ringbuf *ring, struct elem *e);
+void test(struct ringbuf ring);

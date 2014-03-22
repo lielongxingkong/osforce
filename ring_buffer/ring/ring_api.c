@@ -56,16 +56,14 @@ bool empty(struct ringbuf *ring)
 }
 
 /* rear->next == front */
-int push(struct ringbuf *ring, struct elem e)
+int push(struct ringbuf *ring, struct elem *e)
 {
 	return 0;
 }
 
-struct elem pop(struct ringbuf *ring)
+int pop(struct ringbuf *ring, struct elem *e)
 {
-	struct elem e;
-	e.data = 1;
-	return e;
+	return 0;
 }
 
 /*call when full*/

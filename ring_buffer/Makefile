@@ -1,5 +1,5 @@
 obj-m=buf.o
-buf-y=main.o ring/ring_api.o
+buf-y=main.o ring/ring_api.o test/ring.o
 
 CURRENT_PATH=`pwd`
 KERNEL=`uname -r`
