@@ -73,10 +73,8 @@ static int cleanup_threads(void){
 
 static void test(void)
 {
-	struct list_head *ptr;
 	struct ringnode *entry;
-	list_for_each(ptr, &(ring.head)->list){
-		entry = list_entry(ptr, struct ringnode, list);
+	list_for_each_entry(entry, &(ring.head), list){
 		printk("[DEBUG] %d\n", entry->e.data);
 	}
 }
