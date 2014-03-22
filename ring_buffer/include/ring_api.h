@@ -12,11 +12,13 @@ struct elem{
 };
 
 struct ringnode{
+	int seq;
 	struct elem e;
 	struct list_head list;
 };
 
 struct ringbuf{
+	int len;
 	int entries;
 	struct list_head head;
 	struct list_head *front; //head of queue, point to first one
@@ -37,4 +39,4 @@ int extend(struct ringbuf *ring, int extend_len);
 int __push(struct ringbuf *ring, struct elem *e);
 /*pop no lock*/
 int __pop(struct ringbuf *ring, struct elem *e);
-void test(struct ringbuf ring);
+void test(struct ringbuf *ring);
