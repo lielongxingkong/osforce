@@ -24,7 +24,7 @@ int init_ringbuf(struct ringbuf *ring)
 	ring->entries = INIT_LEN;
 	ring->head = &head->list;
 	ring->front = ring->head;
-	ring->rear = ring->head;
+	ring->rear = ring->head->next;
 	return 0;	
 }
 
@@ -40,7 +40,7 @@ int cleanup_ringbuf(struct ringbuf *ring)
 
 bool full(struct ringbuf *ring)
 {
-	if(ring->rear->next == ring->front)
+	if(ring->rear == ring->front)
 		return 1;
 	else
 		return 0;
