@@ -76,7 +76,7 @@ static __init int minit(void){
 	set_reader_number(0);
 	if(create_threads())
 		goto err;
-	test(ring);
+	test(&ring);
 	return 0;
 err:
 	cleanup_threads();
