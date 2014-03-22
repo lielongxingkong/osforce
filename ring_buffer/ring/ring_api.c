@@ -17,7 +17,7 @@ int init_ringbuf(struct ringbuf *ring)
 			return -1;
 		memset(ptr, 0, sizeof(struct ringnode));
 		ptr->e.data = i;
-		list_add(&ptr->list, &head->list);
+		list_add_tail(&ptr->list, &head->list);
 	}
 
 	init_rwsem(&ring->rwsem);	
@@ -91,7 +91,7 @@ int __push(struct ringbuf *ring, struct elem *e)
 		if(extend(ring, EXTEND_LEN))
 			return -1;
 	entry = list_entry(ring->rear->next, struct ringnode, list);
-	entry->e.data = e->data;	
+	memcpy(&entry->e, e, sizeof(struct elem));	
 	ring->rear = ring->rear->next;
 	return 0;
 }
@@ -103,7 +103,7 @@ int __pop(struct ringbuf *ring, struct elem *e)
 	if(empty(ring))
 		return -1;
 	entry = list_entry(ring->front, struct ringnode, list);
-	e->data = entry->e.data;	
+	memcpy(e, &entry->e, sizeof(struct elem));	
 	ring->front = ring->front->next;
 	return 0;
 }

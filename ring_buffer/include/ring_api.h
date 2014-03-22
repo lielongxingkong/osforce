@@ -3,6 +3,7 @@
 #include <linux/err.h>
 #include <linux/rwsem.h>
 #include <linux/semaphore.h>
+#include <linux/string.h>
 #define INIT_LEN	10
 #define EXTEND_LEN	10
 
