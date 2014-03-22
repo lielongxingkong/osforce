@@ -10,14 +10,15 @@ int init_ringbuf(struct ringbuf *ring, int len)
 		if(!ptr)
 			return -1;
 		memset(ptr, 0, sizeof(struct ringnode));
-		ptr->e.data = i;
+		ptr->seq = i;
 		list_add_tail(&ptr->list, &ring->head);
 	}
 
 	init_rwsem(&ring->rwsem);	
-	ring->entries = len;
+	ring->entries = 0;
+	ring->len = len;
 	ring->front = ring->head.next;
-	ring->rear = ring->front->next;
+	ring->rear = ring->front;
 	return 0;	
 }
 
@@ -33,7 +34,9 @@ int cleanup_ringbuf(struct ringbuf *ring)
 
 bool full(struct ringbuf *ring)
 {
-	if(ring->rear == ring->front)
+	if(ring->entries == ring->len)
+		printk("full!\n");
+	if(ring->entries == ring->len)
 		return 1;
 	else
 		return 0;
@@ -42,7 +45,9 @@ bool full(struct ringbuf *ring)
 /* front->next == rear */
 bool empty(struct ringbuf *ring)
 {
-	if(ring->front->next == ring->rear)
+	if(ring->entries == 0)
+		printk("empty!\n");
+	if(ring->entries == 0)
 		return 1;
 	else
 		return 0;
@@ -62,16 +67,17 @@ int pop(struct ringbuf *ring, struct elem *e)
 /*call when full*/
 int extend(struct ringbuf *ring, int extend_len)
 {
-	int i;
+	int i, orig_len;
+	orig_len = ring->len;
 	for(i = 0; i < extend_len; i++){
 		struct ringnode *ptr;
 		ptr = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
 		if(!ptr)
 			return -1;
 		memset(ptr, 0, sizeof(struct ringnode));
-		ptr->e.data = i + ring->entries;
-		list_add(&ptr->list, &ring->head);
-		ring->entries++;
+		ptr->seq = i + orig_len;
+		list_add_tail(&ptr->list, &ring->head);
+		ring->len += 1;
 	}
 	return 0;
 }
@@ -80,11 +86,13 @@ int extend(struct ringbuf *ring, int extend_len)
 int __push(struct ringbuf *ring, struct elem *e)
 {
 	struct ringnode *entry;
-	if(full(ring))
+	entry = list_entry(ring->rear, struct ringnode, list);
+	memcpy(&entry->e, e, sizeof(struct elem));	
+	ring->entries += 1;
+	if(full(ring)){
 		if(extend(ring, EXTEND_LEN))
 			return -1;
-	entry = list_entry(ring->rear->next, struct ringnode, list);
-	memcpy(&entry->e, e, sizeof(struct elem));	
+	}
 	ring->rear = ring->rear->next;
 	return 0;
 }
@@ -97,6 +105,10 @@ int __pop(struct ringbuf *ring, struct elem *e)
 		return -1;
 	entry = list_entry(ring->front, struct ringnode, list);
 	memcpy(e, &entry->e, sizeof(struct elem));	
-	ring->front = ring->front->next;
+	if(ring->front->next == &ring->head)
+		ring->front = ring->front->next->next;
+	else
+		ring->front = ring->front->next;
+	ring->entries -= 1;
 	return 0;
 }
