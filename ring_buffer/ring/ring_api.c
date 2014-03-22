@@ -21,11 +21,15 @@ int init_ringbuf(struct ringbuf *ring)
 	return 0;	
 }
 
-int clean_ringbuf(struct ringbuf *ring)
+int cleanup_ringbuf(struct ringbuf *ring)
 {
+	struct ringnode *next, *ptr;
+	list_for_each_entry_safe(ptr, next, &ring->head, list) {
+		list_del(&ptr->list);
+		kfree(ptr);
+	}
 	return 0;
 }
-
 bool full(struct ringbuf *ring)
 {
 	return 0;

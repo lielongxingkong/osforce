@@ -74,9 +74,11 @@ static int cleanup_threads(void){
 static void test(void)
 {
 	struct ringnode *entry;
+	printk("[DEBUG start] ---------------\n");
 	list_for_each_entry(entry, &(ring.head), list){
 		printk("[DEBUG] %d\n", entry->e.data);
 	}
+	printk("[DEBUG end] ----------------\n");
 }
 
 static __init int minit(void){
@@ -94,6 +96,8 @@ err:
 
 static __exit void mexit(void){
 	printk("call %s\n", __FUNCTION__);
+	cleanup_ringbuf(&ring);
+	test();
 	cleanup_threads();
 }
 module_init(minit);
