@@ -3,29 +3,21 @@
 int init_ringbuf(struct ringbuf *ring)
 {
 	int i;
-	struct rw_semaphore rwsem;
-	struct ringnode *ring_head;
-	ring_head = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
-	INIT_LIST_HEAD(&ring_head->list);	
-	for(i = 1; i < INIT_LENGTH; i++){
-		struct ringnode *nd = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
-		if(!IS_ERR(nd)){
-			struct elem e;
-			e.data = i;
-			nd->e = e;
-			list_add(&nd->list, &ring_head->list);
-		} else {
-			printk("Out of memeory!\n");
+	INIT_LIST_HEAD(&ring->head);	
+	for(i = 0; i < INIT_LENGTH; i++){
+		struct ringnode *ptr;
+		ptr = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
+		if(!ptr)
 			return -1;
-		}
+		memset(ptr, 0, sizeof(struct ringnode));
+		ptr->e.data = i;
+		list_add(&ptr->list, &ring->head);
 	}
 
-	init_rwsem(&rwsem);	
-	ring->head = ring_head;
+	init_rwsem(&ring->rwsem);	
 	ring->entries = INIT_LENGTH;
-	ring->front = ring_head;
-	ring->rear = ring_head;
-	ring->rwsem = rwsem;
+	ring->front = ring->head;
+	ring->rear = ring->head;
 	return 0;	
 }
 
