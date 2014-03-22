@@ -3,7 +3,7 @@
 #include <linux/err.h>
 #include <linux/rwsem.h>
 #include <linux/semaphore.h>
-#define INIT_LENGTH	1000
+#define INIT_LENGTH	10
 
 struct elem{
 	int data;
@@ -15,10 +15,10 @@ struct ringnode{
 };
 
 struct ringbuf{
-	struct ringnode *head;
 	int entries;
-	struct ringnode *front;
-	struct ringnode *rear;
+	struct list_head head;
+	struct list_head front;
+	struct list_head rear;
 	struct rw_semaphore rwsem;
 };
 
