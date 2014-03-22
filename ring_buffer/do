@@ -1,0 +1,6 @@
+#!/bin/sh
+dmesg -c
+clear
+insmod buf.ko
+rmmod buf
+dmesg
