@@ -3,35 +3,28 @@
 int init_ringbuf(struct ringbuf *ring, int len)
 {
 	int i;
-	struct ringnode *head;
-	head = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
-	if(!head)
-		return -1;
-	memset(head, 0, sizeof(struct ringnode));
-	head->e.data = 0;
-	INIT_LIST_HEAD(&head->list);	
-	for(i = 1; i < len; i++){
-		struct ringnode *ptr;
+	struct ringnode *ptr;
+	INIT_LIST_HEAD(&ring->head);	
+	for(i = 0; i < len; i++){
 		ptr = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
 		if(!ptr)
 			return -1;
 		memset(ptr, 0, sizeof(struct ringnode));
 		ptr->e.data = i;
-		list_add_tail(&ptr->list, &head->list);
+		list_add_tail(&ptr->list, &ring->head);
 	}
 
 	init_rwsem(&ring->rwsem);	
 	ring->entries = len;
-	ring->head = &head->list;
-	ring->front = ring->head;
-	ring->rear = ring->head->next;
+	ring->front = ring->head.next;
+	ring->rear = ring->front->next;
 	return 0;	
 }
 
 int cleanup_ringbuf(struct ringbuf *ring)
 {
 	struct ringnode *next, *ptr;
-	list_for_each_entry_safe(ptr, next, ring->head, list) {
+	list_for_each_entry_safe(ptr, next, &ring->head, list) {
 		list_del(&ptr->list);
 		kfree(ptr);
 	}
@@ -77,7 +70,7 @@ int extend(struct ringbuf *ring, int extend_len)
 			return -1;
 		memset(ptr, 0, sizeof(struct ringnode));
 		ptr->e.data = i + ring->entries;
-		list_add(&ptr->list, ring->head);
+		list_add(&ptr->list, &ring->head);
 		ring->entries++;
 	}
 	return 0;

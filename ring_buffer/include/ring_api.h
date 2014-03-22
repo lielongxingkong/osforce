@@ -18,7 +18,7 @@ struct ringnode{
 
 struct ringbuf{
 	int entries;
-	struct list_head *head;
+	struct list_head head;
 	struct list_head *front; //head of queue, point to first one
 	struct list_head *rear;  //tail of queue, point to last one's next position
 	struct rw_semaphore rwsem;
