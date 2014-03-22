@@ -4,8 +4,8 @@
 #include <linux/rwsem.h>
 #include <linux/semaphore.h>
 #include <linux/string.h>
-#define INIT_LEN	10
-#define EXTEND_LEN	10
+#define INIT_LEN	5
+#define EXTEND_LEN	5
 
 struct elem{
 	int data;
@@ -24,7 +24,7 @@ struct ringbuf{
 	struct rw_semaphore rwsem;
 };
 
-int init_ringbuf(struct ringbuf *ring);
+int init_ringbuf(struct ringbuf *ring, int len);
 int cleanup_ringbuf(struct ringbuf *ring);
 bool full(struct ringbuf *ring);
 bool empty(struct ringbuf *ring);

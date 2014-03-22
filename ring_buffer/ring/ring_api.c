@@ -1,6 +1,6 @@
 #include "ring_api.h"
 
-int init_ringbuf(struct ringbuf *ring)
+int init_ringbuf(struct ringbuf *ring, int len)
 {
 	int i;
 	struct ringnode *head;
@@ -10,7 +10,7 @@ int init_ringbuf(struct ringbuf *ring)
 	memset(head, 0, sizeof(struct ringnode));
 	head->e.data = 0;
 	INIT_LIST_HEAD(&head->list);	
-	for(i = 1; i < INIT_LEN; i++){
+	for(i = 1; i < len; i++){
 		struct ringnode *ptr;
 		ptr = (struct ringnode*)kmalloc(sizeof(struct ringnode), GFP_KERNEL);
 		if(!ptr)
@@ -21,7 +21,7 @@ int init_ringbuf(struct ringbuf *ring)
 	}
 
 	init_rwsem(&ring->rwsem);	
-	ring->entries = INIT_LEN;
+	ring->entries = len;
 	ring->head = &head->list;
 	ring->front = ring->head;
 	ring->rear = ring->head->next;

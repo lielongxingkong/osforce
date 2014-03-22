@@ -3,11 +3,13 @@
 void print(struct ringbuf ring)
 {
 	struct ringnode *entry;
-	printk("[DEBUG start] ---------------\n");
+	int len = 0;
+	printk("[DEBUG start] len %d ---------------\n", len);
 	list_for_each_entry(entry, ring.head, list){
+		len++;
 		printk("[DEBUG] %d\n", entry->e.data);
 	}
-	printk("[DEBUG end] ----------------\n");
+	printk("[DEBUG end] %d ----------------\n", len);
 }
 
 void print_circle(struct ringbuf ring, int times)
@@ -23,11 +25,24 @@ void print_circle(struct ringbuf ring, int times)
 	}
 }
 
+void test_extend(struct ringbuf *ring, int push_times)
+{
+	int i, ret;
+	for(i = 0; i < push_times; i++){
+		struct elem e;
+		e.data = i + 80000;
+		ret = push(ring, &e);
+	}
+
+}
+
 void test(struct ringbuf ring)
 {
-	init_ringbuf(&ring);
+	init_ringbuf(&ring, INIT_LEN);
 	print(ring);
-	print_circle(ring, 2);
+	//print_circle(ring, 2);
+	test_extend(&ring, 10);
+	print(ring);
 
 	cleanup_ringbuf(&ring);
 	print(ring);
